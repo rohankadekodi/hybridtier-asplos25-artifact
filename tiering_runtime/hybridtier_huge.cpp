@@ -275,7 +275,7 @@ struct perf_event_mmap_page* perf_setup_one_event(__u64 config, __u64 cpu, __u64
     struct perf_event_attr pe;
     memset(&pe, 0, sizeof(pe));
 
-    std::cout << "[INFO] LFU perf sampling freq: " << perf_sample_freq << std::endl;
+    std::cout << "[INFO] Hybridtier perf sampling freq: " << perf_sample_freq << std::endl;
     //__u64 perf_sample_freq = 400000;
 
     pe.type = PERF_TYPE_RAW;
@@ -753,7 +753,7 @@ std::vector<void*> check_pages_on_node(const std::vector<void*>& addresses, size
 
 
 void* perf_func(void*) {
-    std::cout << "perf LFU tierng. asplos25 huge page. check before promote. resume tiering if too much free mem. orig watermarks" << std::endl;
+    std::cout << "Hybridtier. huge page" << std::endl;
     uint64_t fast_memory_size = FAST_MEMORY_SIZE;
     if (fast_memory_size == 0) {
       std::cout << "ERROR fast tier memory size not provided."  << std::endl;
@@ -773,26 +773,24 @@ void* perf_func(void*) {
     uint64_t num_perf_record_lost = 0;
     uint64_t num_overflow_samples = 0;
 
-    // setup TinyLFU
-
     int initial_hot_thresh = 1000;
     int hot_thresh = initial_hot_thresh;
     int momentum_thresh = 200;
-    // m_from_knp returns the number of counters we need. In our TinyLFU, each counter is 4 bits, and each element in the 
+    // m_from_knp returns the number of counters we need. each counter is 4 bits, and each element in the 
     // bloom array is 64 bits. So we need m*4/64 = m/16 array elements.
-    std::cout << "==== TinyLFU debug info" <<  std::endl;
+    std::cout << "==== debug info" <<  std::endl;
     
-    #ifdef NUM_LFU_ENTRIES_DEF
-    int64_t NUM_LFU_ENTRIES = NUM_LFU_ENTRIES_DEF;
-    std::cout << "[INFO] Manually specifying CBF size = " << NUM_LFU_ENTRIES << std::endl;
+    #ifdef NUM_CBF_ENTRIES_DEF
+    int64_t NUM_CBF_ENTRIES = NUM_CBF_ENTRIES_DEF;
+    std::cout << "[INFO] Manually specifying CBF size = " << NUM_CBF_ENTRIES << std::endl;
     #else
-    int64_t NUM_LFU_ENTRIES = m_from_knp(NUM_HASH_FUNCTIONS, NUM_FAST_MEMORY_PAGES, FALSE_POSITIVE_PROB)/4;
-    std::cout << "[INFO] Calculating CBF size = " << NUM_LFU_ENTRIES  <<  std::endl;
+    int64_t NUM_CBF_ENTRIES = m_from_knp(NUM_HASH_FUNCTIONS, NUM_FAST_MEMORY_PAGES, FALSE_POSITIVE_PROB)/4;
+    std::cout << "[INFO] Calculating CBF size = " << NUM_CBF_ENTRIES  <<  std::endl;
     #endif
     
-    assert(NUM_LFU_ENTRIES >= 0);
-    frequency_sketch<uint64_t> lfu(NUM_LFU_ENTRIES, SAMPLE_SIZE);
-    frequency_sketch<uint64_t> momentum(NUM_LFU_ENTRIES/8, 1100000);
+    assert(NUM_CBF_ENTRIES >= 0);
+    frequency_sketch<uint64_t> lfu(NUM_CBF_ENTRIES, SAMPLE_SIZE);
+    frequency_sketch<uint64_t> momentum(NUM_CBF_ENTRIES/8, 1100000);
     std::cout << std::dec << "Starting hot threshold = " << hot_thresh << std::endl;
     std::cout << std::dec << "Momentum threshold = " << momentum_thresh << std::endl;
     std::cout << std::dec << "Stable fast mem hit ratio slope threshold = " << SLOPE_THRESH << std::endl;

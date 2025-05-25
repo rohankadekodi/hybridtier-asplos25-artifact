@@ -85,8 +85,7 @@ public:
         sample_size_ = sample_size;
         printf("Blocked CBF + sample batch. \n");
         printf("vector start %p, \n", &(table_[0]));
-        std::cout << "[INFO] Creating TinyLFU with capacity = " << table_size_ << " (each 8B), sample size (W) = " << sample_size << std::endl;
-        //std::cout << "[INFO] Creating TinyLFU with capacity = " << table_.size() << " (each 8B), sample size (W) = " << sample_size << std::endl;
+        std::cout << "[INFO] Creating CBF with capacity = " << table_size_ << " (each 8B), sample size (W) = " << sample_size << std::endl;
     }
 
     uint32_t spread(uint32_t x) const {
@@ -114,7 +113,7 @@ public:
         //table_.resize(detail::nearest_power_of_two(n));
         table_size_ = detail::nearest_power_of_two(n);
         table_ = (uint64_t*)aligned_alloc(64, sizeof(uint64_t) * table_size_);
-        printf("Actual LFU table size %ld \n", table_size_);
+        printf("Actual CBF table size %ld \n", table_size_);
         size_ = 0;
 
         blockMask_ = (table_size_ >> 3) - 1;
@@ -301,7 +300,7 @@ public:
         
 
     void print_frequency_dist() {
-      printf("TinyLFU freq dist: %ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld \n", 
+      printf("CBF freq dist: %ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld \n", 
                                  frequency_dist[0], frequency_dist[1], frequency_dist[2], frequency_dist[3],
                                  frequency_dist[4], frequency_dist[5], frequency_dist[6], frequency_dist[7],
                                  frequency_dist[8], frequency_dist[9], frequency_dist[10], frequency_dist[11],
@@ -356,7 +355,7 @@ public:
 
     void reset() noexcept
     {
-        printf("[DEBUG] Resetting TinyLFU counters.\n");
+        printf("[DEBUG] Resetting CBF counters.\n");
         for(uint32_t i = 0; i < table_size_; i++) {
             table_[i] = 0;
         }
@@ -371,7 +370,7 @@ public:
     /** Halves every counter and adjusts $size_. */
     void age() noexcept
     {
-        printf("[DEBUG] Halving TinyLFU counters.\n");
+        printf("[DEBUG] Halving CBF counters.\n");
         for(uint32_t i = 0; i < table_size_; i++) {
             // Do a 'bitwise_and' on each (4 bit) counter with 0111 (7) so as to
             // eliminate the bit that got shifted over from the counter to the left to
