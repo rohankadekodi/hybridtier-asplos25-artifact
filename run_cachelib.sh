@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Usage: sudo BIGMEMBENCH_COMMON_PATH=$BIGMEMBENCH_COMMON_PATH ./run_cachelib.sh <fast-mem-size-GB> <tiering-system>
-# tiering-system is one of LFU, AUTONUMA, TPP, ARC
 
 # import common functions
 if [ "$BIGMEMBENCH_COMMON_PATH" = "" ] ; then 
@@ -12,7 +10,7 @@ source ${BIGMEMBENCH_COMMON_PATH}/run_exp_common.sh
 
 if [ $# -ne 3 ]; then
   echo "Usage: ./run_cachelib.sh <fast-mem-size-GB> <tiering-system> <page-type>"
-  echo "tiering-system is one of hybridter, AUTONUMA, TPP, ARC."
+  echo "tiering-system is one of HYBRIDTER, AUTONUMA, TPP, ARC."
   echo "page-type is one of regular, huge."
   exit 1
 fi

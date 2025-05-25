@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LFU_KERNEL_VER="6.2.0-hybridtier+"
+HYBRIDTIER_KERNEL_VER="6.2.0-hybridtier+"
 AUTONUMA_KERNEL_VER="6.2.0-autonuma+"
 TPP_KERNEL_VER="6.0.0+"
 MULTICLOCK_KERNEL_VER="5.3.1-multiclock"
@@ -12,16 +12,16 @@ PERF_STAT_PID=
 
 config_tiering_system() {
   TIERING_SYSTEM=$1
-  if [ "$TIERING_SYSTEM" = "LFU" ]   ; then
-    enable_lfu
+  if [ "$TIERING_SYSTEM" = "HYBRIDTIER" ]   ; then
+    enable_hybridtier
   elif [ "$TIERING_SYSTEM" = "AUTONUMA" ]; then
     enable_autonuma "MGLRU"
   elif [ "$TIERING_SYSTEM" = "TPP" ]; then
     enable_tpp
   elif [ "$TIERING_SYSTEM" = "ARC" ]; then
-    enable_lfu
+    enable_hybridtier
   elif [ "$TIERING_SYSTEM" = "TWOQ" ]; then
-    enable_lfu
+    enable_hybridtier
   elif [ "$TIERING_SYSTEM" = "ALL_LOCAL" ]; then
     disable_numa
   else
@@ -82,7 +82,7 @@ run_bench () {
   HOOK_DIR="${BIGMEMBENCH_COMMON_PATH}/hook"
   HOOK_SO="${HOOK_DIR}/hook.so"
 
-  if [[ "$TIERING_SYSTEM" == "LFU" ]]; then
+  if [[ "$TIERING_SYSTEM" == "HYBRIDTIER" ]]; then
     pushd $HOOK_DIR > /dev/null
 
     # HybridTier has different runtime implementation for regular and huge page
@@ -392,11 +392,11 @@ disable_numa () {
   echo "/sys/kernel/mm/lru_gen/enabled: $MGLRU_ENABLED (0x0000)"
 }
 
-# setup environment for TinyLFU tiering
-enable_lfu () {
+# setup environment for HybridTier tiering
+enable_hybridtier () {
   # check Linux kernel version
   KERNEL_VER=$(uname -r)
-  if [ "$KERNEL_VER" != "$LFU_KERNEL_VER" ] ; then
+  if [ "$KERNEL_VER" != "$HYBRIDTIER_KERNEL_VER" ] ; then
     echo "ERROR! Expecting kernel version $NO_NUMA_KERNEL_VER to evaluate solutions that has Linux NUMA disabled, but $KERNEL_VER detected."
     echo "The expected kernel version is defined as NO_NUMA_KERNEL_VER in ${BIGMEMBENCH_COMMON_PATH}/run_exp_common.sh"
     exit 1
@@ -424,7 +424,7 @@ enable_lfu () {
   || [ "$LRU_GEN" != "0x0000" ] \
   || [ "$WATERMARK_SCALE_FACTOR" != "10" ] \
   || [ "$NUMAD_OUT" != "inactive" ] ; then
-    echo "ERROR! LFU kernel parameter configuration failed."
+    echo "ERROR! HYBRIDTIER kernel parameter configuration failed."
     echo "numad service status: $NUMAD_OUT (inactive)"
     echo "/proc/sys/vm/zone_reclaim_mode: $ZONE_RECLAIM_MODE (0)"
     echo "/proc/sys/kernel/numa_balancing: $NUMA_BALANCING (0)"
@@ -434,7 +434,7 @@ enable_lfu () {
     exit 1
   fi
 
-  echo "LFU setup successful."
+  echo "HYBRIDTIER setup successful."
   echo "numad service status: $NUMAD_OUT (inactive)"
   echo "/proc/sys/vm/zone_reclaim_mode: $ZONE_RECLAIM_MODE (0)"
   echo "/proc/sys/kernel/numa_balancing: $NUMA_BALANCING (0)"
@@ -474,7 +474,7 @@ get_cmd_prefix () {
     RET_CMD="${TIME_PREFIX} /usr/bin/numactl --cpunodebind=0"
   elif [[ "$CONFIG" == "AUTONUMA" ]]; then
     RET_CMD="${TIME_PREFIX} /usr/bin/numactl --cpunodebind=0"
-  elif [[ "$CONFIG" == "LFU" ]]; then
+  elif [[ "$CONFIG" == "HYBRIDTIER" ]]; then
     RET_CMD="${TIME_PREFIX} /usr/bin/numactl --cpunodebind=0"
   elif [[ "$CONFIG" == "ARC" ]]; then
     # since ARC assumes cache is initially empty, start by allocating every on slow tier
@@ -612,26 +612,6 @@ huge_page_on () {
 }
 
 
-
-
-
-
-
 [[ $EUID -ne 0 ]] && echo "This script must be run using sudo or as root." && exit 1
 # Turn off swap to SSD
 swapoff /swap.img
-#clean_cache
-
-#echo "huge page settings"
-#echo "never" | tee /sys/kernel/mm/transparent_hugepage/enabled
-#echo "never" | tee /sys/kernel/mm/transparent_hugepage/defrag
-#cat /sys/kernel/mm/transparent_hugepage/enabled
-#cat /sys/kernel/mm/transparent_hugepage/defrag
-
-#echo "!!! hardcoded enabling autonuma!!!!"
-#disable_numa 
-#enable_damo 
-#enable_autonuma "MGLRU"
-#enable_autonuma "LRU"
-#enable_lfu 
-#enable_tpp 
