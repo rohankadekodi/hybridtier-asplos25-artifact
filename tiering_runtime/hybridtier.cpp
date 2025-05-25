@@ -374,15 +374,6 @@ void start_perf_stat() {
   std::cout << "[INFO] perf stat command return code: " << ret_code << std::endl;
 }
 
-// Actually no place to call this. Just terminate in experiment script
-//void kill_perf_stat() {
-//  std::cout << "[INFO] Terminating perf stat." << std::endl;
-//  const char* perf_stat_kill_cmd = "kill $(pidof perf)";
-//  ret_code = system(perf_stat_kill_cmd);
-//  std::cout << "[INFO] perf stat kill command return code: " << ret_code << std::endl;
-//}
-
-
 // higher_or_lower == true: return the next higher sampling frequency
 // higher_or_lower == false: return the next lower sampling frequency
 uint32_t next_sampling_freq(uint32_t cur_sampling_freq, bool higher_or_lower) {
@@ -544,90 +535,6 @@ void low_overhead_monitor() {
   }
 }
 
-//void monitor_perf_stat() {
-//  // TODO: make output file name + period variables?
-//  // TODO: make hit ratio threshold a variable?
-//  std::cout << "[INFO] Starting perf stat monitoring." << std::endl;
-//  // I am using the perf executable instead of perf_event_open to monitor hardware counters
-//  // because there is no need to use perf_event_open, since the performance overhead of using the perf executable 
-//  // is negligible. 
-//    const char* perf_stat_cmd = "/ssd1/songxin8/thesis/autonuma/linux-6.1-rc6/tools/perf/perf stat -I 300000 -e mem_load_l3_miss_retired.local_dram -e mem_load_l3_miss_retired.remote_dram -x , --output perf_stat_file &";
-//  // Extract the last two lines of the log file produced by perf stat. 
-//  // The second last line contains the number of local DRAM samples, the last remote DRAM samples.
-//  const char* perf_stat_local_mem_cmd = "tail -n2 perf_stat_file | head -n1 | cut -f2 -d,";
-//  const char* perf_stat_remote_mem_cmd = "tail -n2 perf_stat_file | tail -n1 | cut -f2 -d,";
-//  int ret_code;
-//  uint64_t mem_load_local_dram = 0;
-//  uint64_t mem_load_remote_dram = 0;
-//  double fast_mem_hit_ratio = 0;
-//  double prev_fast_mem_hit_ratio = 0; 
-//  uint16_t num_iters_elapsed = 0;
-//  // The default condition for restarting perf sampling + TinyLFU is if the fast memory hit ratio
-//  // drops by more than 5% between 30 seconds. However, some workloads may exhibit slowly degrading
-//  // fast memory hit ratios (e.g. popularity distribution changes over a day), so their fast memory 
-//  // hit ratio will gradually drop over e.g. hours. Thus, we force restart perf sampling + TinyLFU
-//  // every 30 minutes. 
-//  //uint16_t max_num_iters_elapsed = 60; // 60 iters * 30s = 30 minutes
-//  //uint16_t max_num_iters_elapsed = 12; // 12 iters * 300s = 60 minutes
-//  uint16_t max_num_iters_elapsed = 24; // 24 iters * 300s = 120 minutes for rocksdb
-//  std::cout << "[INFO] Force restarting perf sampling + TinyLFU after 120 minutes." << std::endl;
-//  // Launch perf stat in the command line. 
-//  ret_code = system(perf_stat_cmd);
-//  std::cout << "[INFO] perf stat command return code: " << ret_code << std::endl;
-//  // Sleeping here to give perf stat a chance to output something first.
-//  //sleep(45);
-//  sleep(400);
-//  while(true) {
-//    num_iters_elapsed++;
-//    // This chunk of code is responsible for executing the two tail commands and saving their outputs.
-//    std::array<char, 128> local_loads_buffer, remote_loads_buffer;
-//    std::string local_loads, remote_loads;
-//    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(perf_stat_local_mem_cmd, "r"), pclose);
-//    while (fgets(local_loads_buffer.data(), local_loads_buffer.size(), pipe.get()) != nullptr) {
-//        local_loads += local_loads_buffer.data();
-//    }
-//    std::unique_ptr<FILE, decltype(&pclose)> pipe2(popen(perf_stat_remote_mem_cmd, "r"), pclose);
-//    while (fgets(remote_loads_buffer.data(), remote_loads_buffer.size(), pipe2.get()) != nullptr) {
-//        remote_loads += remote_loads_buffer.data();
-//    }
-//    // Remove the trailing next line characters
-//    if (!local_loads.empty() && local_loads[local_loads.length()-1] == '\n') {
-//      local_loads.erase(local_loads.length()-1);
-//    }
-//    if (!remote_loads.empty() && remote_loads[remote_loads.length()-1] == '\n') {
-//      remote_loads.erase(remote_loads.length()-1);
-//    }
-//    // Convert string to long
-//    mem_load_local_dram = std::stol(local_loads);
-//    mem_load_remote_dram = std::stol(remote_loads);
-//    prev_fast_mem_hit_ratio = fast_mem_hit_ratio;
-//    fast_mem_hit_ratio = (float)mem_load_local_dram / ((float)mem_load_local_dram + (float)mem_load_remote_dram) * 100;
-//    std::cout << "hit ratio: " << fast_mem_hit_ratio << ", prev hit ratio: " << prev_fast_mem_hit_ratio << ". Iters elapsed: " << num_iters_elapsed << std::endl;
-//    if (num_iters_elapsed > 2) {
-//      // Give sometimes for the counters to stablize. Only start checking after 2 iters.
-//      if (prev_fast_mem_hit_ratio - fast_mem_hit_ratio >= 10 || num_iters_elapsed == max_num_iters_elapsed ) {
-//        if (num_iters_elapsed == max_num_iters_elapsed) {
-//          std::cout << "120 minutes elapsed. Restarting TinyLFU." << std::endl;
-//        } else {
-//        // If the fast memory hit ratio drops by more than 10%, restart TinyLFU and perf sampling to adjust to the
-//        // access frequency distribution.
-//          std::cout << "Fast memory hit ratio drops by " << prev_fast_mem_hit_ratio - fast_mem_hit_ratio << ", which is more than 5%. Restarting TinyLFU." << std::endl;
-//        }
-//        std::cout << "terminating." << std::endl;
-//        const char* perf_stat_kill_cmd = "kill $(pidof perf)";
-//        ret_code = system(perf_stat_kill_cmd);
-//        std::cout << "[INFO] perf stat kill command return code: " << ret_code << std::endl;
-//        return;
-//      }
-//    }
-//    // This sleep interval should match the interval (-I) in the perf stat commands.
-//    // Wake up every X seconds to monitor the result of perf stat.
-//    sleep(300);
-//  }
-//  
-//  return;
-//}
-
 // Returns amount of free memory in node 0 in KB
 uint64_t get_node0_free_mem() {
   std::string path = "/sys/devices/system/node/node0/meminfo";
@@ -786,19 +693,6 @@ uint64_t scan_for_cold_pages(int pid, int hot_thresh,
 }
 
 void* perf_func(void*) {
-
-    //pthread_t thread_id = pthread_self();
-    //printf("tiering thread id %d \n", thread_id);
-    //cpu_set_t cpuset;
-    //CPU_ZERO(&cpuset);          // Clear all CPUs
-    //CPU_SET(7, &cpuset);        // Add CPU 0 to the set
-
-    //// Set affinity of the thread to CPU 0
-    //int result = pthread_setaffinity_np(thread_id, sizeof(cpu_set_t), &cpuset);
-    //if (result != 0) {
-    //    perror("pthread_setaffinity_np");
-    //}
-
 
     uint64_t fast_memory_size = FAST_MEMORY_SIZE;
     if (fast_memory_size == 0) {
@@ -1231,21 +1125,6 @@ perf_sampling_start:
                     }
                     num_sample_batches++;
 
-                    /*
-                    // For every 200 sample batches, see if we need to increase the hot threshold. 
-                    if (num_sample_batches % 200 == 0 && num_sample_batches != 0){
-                      uint64_t cur_num_hot_pages = lfu.get_num_hot_pages(hot_thresh);
-                      uint64_t cur_num_hot_pages_size_bytes = cur_num_hot_pages*4096;
-                      if (cur_num_hot_pages_size_bytes >= fast_memory_size) { 
-                        // If there are too many hot pages and not enough total capacity in the fast tier memory, 
-                        // increase the hot threshold so that we only keep the hottest data in fast tier memory.
-                        // If hot_thresh already max, do not increase it anymore. 
-                        hot_thresh = (hot_thresh == 15) ? 15 : hot_thresh+1; // max 15
-                        printf("[INFO] Increase hot thresh to %d. Current hot page size is %ld, threshold is %ld \n", hot_thresh, cur_num_hot_pages_size_bytes, fast_memory_size*8/10);
-                      }
-                    }
-                    */
-  
                     // Check for promotion plateau: if we promoted less than 25k pages (100MB) in 20 sample batches, 
                     // this is an indicator that there are not much hot pages left to promote. Thus, keeping 
                     // perf sampling ON is likely a waste of resources. 

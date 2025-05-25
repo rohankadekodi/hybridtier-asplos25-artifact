@@ -970,38 +970,6 @@ perf_sampling_start:
                     size_t num_pages_in_fast = num_pages_to_migrate - num_pages_in_slow;
 
 
-                    // For debug
-                    // Before promoting, check how many pages are actually in slow tier. 
-                    // If PEBS counter is accurate, all pages to be promoted should be in slow tier
-                    //int* dbg_status = new int[num_pages_to_migrate];
-                    //int dbg_ret; 
-
-                    //for (uint64_t kk = 0; kk < num_pages_to_migrate; kk++) {
-                    //  dbg_status[kk] = 99;
-                    //}
-
-                    //dbg_ret = numa_move_pages(0, num_pages_to_migrate, (void **)migrate_pages, NULL, dbg_status, MPOL_MF_MOVE_ALL);
-                    //uint64_t num_pages_in_fast = 0;
-                    //uint64_t num_pages_in_slow = 0;
-                    //if (dbg_ret == 0) {
-                    //  for (uint64_t ll = 0; ll < num_pages_to_migrate; ll++) {
-                    //    if (dbg_status[ll] == 0) {
-                    //      num_pages_in_fast++;
-                    //    } else if (dbg_status[ll] == 1) {
-                    //      num_pages_in_slow++;
-                    //      //printf("promoting slow tier page %lx\n", (uint64_t)(migrate_pages[ll]));
-                    //    } else {
-                    //      //printf("unexpected page status %d\n", dbg_status[ll]);
-                    //      uint64_t tmp_pg_addr = (uint64_t)(migrate_pages[ll]);
-                    //      int tmp_pg_freq = lfu.frequency(tmp_pg_addr);
-                    //      //printf("page %lx, freq %lx \n",  tmp_pg_addr, tmp_pg_freq);
-                    //    }
-                    //  }
-                    //  printf("promote candidate pages in fast tier %d, slow tier %d\n", num_pages_in_fast, num_pages_in_slow);
-                    //  
-                    //} else {
-                    //  printf("debug move page failed.\n");
-                    //}
 
                     //delete[] dbg_status;
                     if (num_pages_in_slow == 0) {
@@ -1193,21 +1161,6 @@ perf_sampling_start:
                     }
                     num_sample_batches++;
 
-                    /*
-                    // For every 200 sample batches, see if we need to increase the hot threshold. 
-                    if (num_sample_batches % 200 == 0 && num_sample_batches != 0){
-                      uint64_t cur_num_hot_pages = lfu.get_num_hot_pages(hot_thresh);
-                      uint64_t cur_num_hot_pages_size_bytes = cur_num_hot_pages*4096;
-                      if (cur_num_hot_pages_size_bytes >= fast_memory_size) { 
-                        // If there are too many hot pages and not enough total capacity in the fast tier memory, 
-                        // increase the hot threshold so that we only keep the hottest data in fast tier memory.
-                        // If hot_thresh already max, do not increase it anymore. 
-                        hot_thresh = (hot_thresh == 15) ? 15 : hot_thresh+1; // max 15
-                        printf("[INFO] Increase hot thresh to %d. Current hot page size is %ld, threshold is %ld \n", hot_thresh, cur_num_hot_pages_size_bytes, fast_memory_size*8/10);
-                      }
-                    }
-                    */
-  
                     // Check for promotion plateau: if we promoted less than (40MB) in 20 sample batches, 
                     // this is an indicator that there are not much hot pages left to promote. Thus, keeping 
                     // perf sampling ON is likely a waste of resources. 
