@@ -1,0 +1,31 @@
+[INFO] TPP config. 
+PID: 3607
+threads=16
+Running for 400M iterations.
+num rows = 2097152
+[INFO] Allocating memory region without specifying the node.
+68719476736 bytes
+done initialization 
+starting addr: 0x7f6a3ab5b010
+ ending addr: 0x7f7a3ab53010
+generating requests now
+[WARNING] Generated row is outside of table range: 2102685
+[WARNING] Generated row is outside of table range: -11959
+[WARNING] Generated row is outside of table range: -11959
+[WARNING] Generated row is outside of table range: -27338
+[WARNING] Generated row is outside of table range: -8536
+[WARNING] Generated row is outside of table range: -13544
+[WARNING] Generated row is outside of table range: -13544
+allocated aux data structures.
+[INFO] Enabling TPP 
+[INFO] enable tpp command return code: 0
+index generation done
+Start access iteration 0
+Time = 284320251[µs]
+Start access iteration 1
+Time = 224593032[µs]
+Start access iteration 2
+Time = 260741449[µs]
+Start access iteration 3
+Time = 239962924[µs]
+Start access iteration 4

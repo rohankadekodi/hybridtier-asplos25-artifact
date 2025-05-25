@@ -1,0 +1,24 @@
+[INFO] AutoNUMA config. 
+PID: 3439
+threads=16
+Running for 400M iterations.
+num rows = 2097152
+[INFO] Allocating memory region without specifying the node.
+68719476736 bytes
+done initialization 
+starting addr: 0x7f223ea00010
+ ending addr: 0x7f323e9f8010
+generating requests now
+[WARNING] Generated row is outside of table range: [WARNING] Generated row is outside of table range: -79915-79915
+
+[WARNING] Generated row is outside of table range: -47170
+[WARNING] Generated row is outside of table range: -70669
+[WARNING] Generated row is outside of table range: [WARNING] Generated row is outside of table range: -70
+-70
+allocated aux data structures.
+[INFO] Enabling AutoNUMA 
+sh: 1: cannot create /proc/sys/kernel/numa_balancing_promote_rate_limit_MBps: Directory nonexistent
+sh: 1: cannot create /sys/kernel/mm/lru_gen/enabled: Directory nonexistent
+[INFO] enable autonuma command return code: 512
+index generation done
+Start access iteration 0
