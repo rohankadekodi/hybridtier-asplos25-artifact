@@ -9,14 +9,16 @@ if [ "$BIGMEMBENCH_COMMON_PATH" = "" ] ; then echo "ERROR: bigmembench_common sc
 fi
 source ${BIGMEMBENCH_COMMON_PATH}/run_exp_common.sh 
 
-if [ $# -ne 2 ]; then
-  echo "Usage: ./run_cachelib.sh <fast-mem-size-GB> <tiering-system>"
-  echo "tiering-system is one of LFU, AUTONUMA, TPP, ARCA"
+if [ $# -ne 3 ]; then
+  echo "Usage: ./run_cachelib.sh <fast-mem-size-GB> <tiering-system> <page-type>"
+  echo "tiering-system is one of hybridter, AUTONUMA, TPP, ARC."
+  echo "page-type is one of regular, huge."
   exit 1
 fi
 
 FAST_TIER_SIZE_GB=$1
 TIERING_SYSTEM=$2
+PAGE_TYPE=$3
 
 NUM_THREADS=16
 export OMP_NUM_THREADS=${NUM_THREADS}
@@ -26,61 +28,56 @@ DURATION=3600
 NUM_ITERS=1
 
 declare -a GRAPH_LIST=("g31k4" "u31k4")
-#declare -a GRAPH_LIST=("u31k4")
 declare -a EXE_LIST=("bfs" "cc" "pr")
-#declare -a PAGE_TYPE_LIST=("regular" "huge")
 declare -a PAGE_TYPE_LIST=("regular")
 
-for page_type in "${PAGE_TYPE_LIST[@]}" 
-do
-  #TODO: this should be moved to run exp common
-  # set page type
-  if [ "$page_type" = "regular" ] ; then 
-    huge_page_off
-  elif [ "$page_type" = "huge" ] ; then 
-    huge_page_on
-  else 
-    echo "ERROR: unknow page type $page_type"
-  fi
+#TODO: this should be moved to run exp common
+# set page type
+if [ "$PAGE_TYPE" = "regular" ] ; then 
+  huge_page_off
+elif [ "$PAGE_TYPE" = "huge" ] ; then 
+  huge_page_on
+else 
+  echo "ERROR: unknow page type $PAGE_TYPE"
+fi
 
-  for graph in "${GRAPH_LIST[@]}"
+for graph in "${GRAPH_LIST[@]}"
+do
+  for exe in "${EXE_LIST[@]}"
   do
-    for exe in "${EXE_LIST[@]}"
-    do
-      if [[ "$graph" == "g31k4" ]]; then
-        case $exe in
-          "bfs")
-            COMMAND_STRING="${WORKLOAD_DIR}/${exe} -g 31 -k 4 -n256"
-            ;;
-          "pr")
-            COMMAND_STRING="${WORKLOAD_DIR}/${exe} -g 31 -k 4 -i1000 -t1e-4 -n16"
-            ;;
-          "cc")
-            COMMAND_STRING="${WORKLOAD_DIR}/${exe} -g 31 -k 4 -n256"
-            ;;
-          *)
-            echo -n "ERROR: Unknown executable $exe"
-            exit 1
-            ;;
-        esac
-      elif [[ "$graph" == "u31k4" ]]; then
-        case $exe in
-          "bfs")
-            COMMAND_STRING="${WORKLOAD_DIR}/${exe} -u 31 -k 4 -n64"
-            ;;
-          "pr")
-            COMMAND_STRING="${WORKLOAD_DIR}/${exe} -u 31 -k 4 -i1000 -t1e-4 -n8"
-            ;;
-          "cc")
-            COMMAND_STRING="${WORKLOAD_DIR}/${exe} -u 31 -k 4 -n32"
-            ;;
-          *)
-            echo -n "ERROR: Unknown executable $exe"
+    if [[ "$graph" == "g31k4" ]]; then
+      case $exe in
+        "bfs")
+          COMMAND_STRING="${WORKLOAD_DIR}/${exe} -g 31 -k 4 -n256"
+          ;;
+        "pr")
+          COMMAND_STRING="${WORKLOAD_DIR}/${exe} -g 31 -k 4 -i1000 -t1e-4 -n16"
+          ;;
+        "cc")
+          COMMAND_STRING="${WORKLOAD_DIR}/${exe} -g 31 -k 4 -n256"
+          ;;
+        *)
+          echo -n "ERROR: Unknown executable $exe"
           exit 1
           ;;
-        esac
-      fi
-      run_bench "$graph" "$COMMAND_STRING" "$exe" "$TIERING_SYSTEM" "$FAST_TIER_SIZE_GB" "$page_type"
-    done
+      esac
+    elif [[ "$graph" == "u31k4" ]]; then
+      case $exe in
+        "bfs")
+          COMMAND_STRING="${WORKLOAD_DIR}/${exe} -u 31 -k 4 -n64"
+          ;;
+        "pr")
+          COMMAND_STRING="${WORKLOAD_DIR}/${exe} -u 31 -k 4 -i1000 -t1e-4 -n8"
+          ;;
+        "cc")
+          COMMAND_STRING="${WORKLOAD_DIR}/${exe} -u 31 -k 4 -n32"
+          ;;
+        *)
+          echo -n "ERROR: Unknown executable $exe"
+        exit 1
+        ;;
+      esac
+    fi
+    run_bench "$graph" "$COMMAND_STRING" "$exe" "$TIERING_SYSTEM" "$FAST_TIER_SIZE_GB" "$PAGE_TYPE"
   done
 done

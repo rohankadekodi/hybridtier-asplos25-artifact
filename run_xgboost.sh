@@ -10,33 +10,30 @@ if [ "$BIGMEMBENCH_COMMON_PATH" = "" ] ; then
 fi
 source ${BIGMEMBENCH_COMMON_PATH}/run_exp_common.sh
 
-if [ $# -ne 2 ]; then
-  echo "Usage: ./run_cachelib.sh <fast-mem-size-GB> <tiering-system>"
-  echo "tiering-system is one of LFU, AUTONUMA, TPP, ARC."
+if [ $# -ne 3 ]; then
+  echo "Usage: ./run_cachelib.sh <fast-mem-size-GB> <tiering-system> <page-type>"
+  echo "tiering-system is one of hybridter, AUTONUMA, TPP, ARC."
+  echo "page-type is one of regular, huge."
   exit 1
 fi
 
 FAST_TIER_SIZE_GB=$1
 TIERING_SYSTEM=$2
+PAGE_TYPE=$3
 
 WORKLOAD_DIR="/ssd1/songxin8/thesis/hybridtier/workloads/xgboost/"
 EXE="xgboost"
-#declare -a PAGE_TYPE_LIST=("regular" "huge")
-declare -a PAGE_TYPE_LIST=("regular")
 
 echo "Fast tier size is $FAST_TIER_SIZE_GB GB"
 echo "Runnign tiering system $TIERING_SYSTEM"
 
-for page_type in "${PAGE_TYPE_LIST[@]}" 
-do
-  # set page type
-  if [ "$page_type" = "regular" ] ; then 
-    huge_page_off
-  elif [ "$page_type" = "huge" ] ; then 
-    huge_page_on
-  else 
-    echo "ERROR: unknow page type $page_type"
-  fi
-  COMMAND_STRING="${WORKLOAD_DIR}/${EXE} ${WORKLOAD_DIR}/train2.dev.conf"
-  run_bench "" "$COMMAND_STRING" "$EXE" "$TIERING_SYSTEM" "$FAST_TIER_SIZE_GB" "$page_type"
-done
+# set page type
+if [ "$PAGE_TYPE" = "regular" ] ; then 
+  huge_page_off
+elif [ "$PAGE_TYPE" = "huge" ] ; then 
+  huge_page_on
+else 
+  echo "ERROR: unknow page type $PAGE_TYPE"
+fi
+COMMAND_STRING="${WORKLOAD_DIR}/${EXE} ${WORKLOAD_DIR}/train2.dev.conf"
+run_bench "" "$COMMAND_STRING" "$EXE" "$TIERING_SYSTEM" "$FAST_TIER_SIZE_GB" "$PAGE_TYPE"
