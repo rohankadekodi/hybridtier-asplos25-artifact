@@ -4,15 +4,15 @@
 #include <unistd.h>
 
 #if defined(HYBRIDTIER_REGULAR)
-    #include "../tinylfu/perf_lfu.cpp"
+    #include "../tinylfu/hybridtier.cpp"
 #elif defined(HYBRIDTIER_HUGE)
-    #include "../tinylfu/perf_lfu_huge.cpp"
+    #include "../tinylfu/hybridtier_huge.cpp"
 #elif defined(ARC_TIERING)
     #include "../tinylfu/arc.cpp"
 #elif defined(TWOQ_TIERING)
     #include "../tinylfu/twoq.cpp"
 #else
-    #include "../tinylfu/perf_lfu.cpp"
+    #include "../tinylfu/hybridtier.cpp"
 #endif
 
 // Type definition for the original __libc_start_main function
