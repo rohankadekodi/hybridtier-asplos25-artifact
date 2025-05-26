@@ -24,9 +24,9 @@ WORKLOAD_DIR="/ssd1/songxin8/thesis/hybridtier/workloads/gapbs"
 DURATION=3600
 NUM_ITERS=1
 
-declare -a GRAPH_LIST=("g31k4" "u31k4")
+#declare -a GRAPH_LIST=("g31k4" "u31k4")
+declare -a GRAPH_LIST=("g31k4")
 declare -a EXE_LIST=("bfs" "cc" "pr")
-declare -a PAGE_TYPE_LIST=("regular")
 
 #TODO: this should be moved to run exp common
 # set page type
