@@ -87,22 +87,22 @@ run_bench () {
 
     # HybridTier has different runtime implementation for regular and huge page
     if [[ "$PAGE_TYPE" == "regular" ]]; then
-      PAGE_TYPE="HYBRIDTIER_REGULAR"
+      DPAGE_TYPE="HYBRIDTIER_REGULAR"
     elif [[ "$PAGE_TYPE" == "huge" ]]; then
-      PAGE_TYPE="HYBRIDTIER_HUGE"
+      DPAGE_TYPE="HYBRIDTIER_HUGE"
     fi 
 
     echo "g++ -shared -fPIC -g hook.cpp -o hook.so -O3 \
         -ldl -lpthread -lnuma \
         -DFAST_MEMORY_SIZE_GB=${FAST_TIER_SIZE_GB} \
         -DTARGET_EXE_NAME=\"${EXE_NAME}\" \
-        -D${PAGE_TYPE} ${EXTRA_COMPILE_ARGS}"
+        -D${DPAGE_TYPE} ${EXTRA_COMPILE_ARGS}"
 
     g++ -shared -fPIC -g hook.cpp -o hook.so -O3 \
         -ldl -lpthread -lnuma \
         -DFAST_MEMORY_SIZE_GB=${FAST_TIER_SIZE_GB} \
         -DTARGET_EXE_NAME=\"${EXE_NAME}\" \
-        -D${PAGE_TYPE} ${EXTRA_COMPILE_ARGS}
+        -D${DPAGE_TYPE} ${EXTRA_COMPILE_ARGS}
 
     popd > /dev/null
     export LD_PRELOAD=${HOOK_SO}
