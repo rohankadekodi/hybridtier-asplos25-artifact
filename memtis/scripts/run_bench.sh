@@ -10,7 +10,7 @@ MEM_NODES=($(ls /sys/devices/system/node | grep node | awk -F 'node' '{print $NF
 
 CGROUP_NAME="htmm"
 ###### update DIR!
-DIR=/ssd1/songxin8/thesis/memtis/memtis_ecosys/memtis-userspace
+DIR=/ssd1/songxin8/thesis/hybridtier/hybridtier-asplos25-artifact/memtis
 
 ## Script to periodically clean page cache. Used for cachelib twitter trace workloads
 CLEAR_PAGE_CACHE_SCRIPT=/ssd1/songxin8/thesis/bigmembench/bigmembench_common_momentum/clear_page_cache.sh
