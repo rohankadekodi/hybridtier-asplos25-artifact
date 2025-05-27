@@ -1,0 +1,49 @@
+#!/bin/bash
+
+mount /dev/nvme0n1p1 /ssd1/
+
+export BIGMEMBENCH_COMMON_PATH="/ssd1/songxin8/thesis/hybridtier/hybridtier-asplos25-artifact"
+
+script_dir="/ssd1/songxin8/thesis/hybridtier/hybridtier-asplos25-artifact"
+marker_file="/ssd1/songxin8/thesis/hybridtier/hybridtier-asplos25-artifact/exp_tracker"
+
+pushd $script_dir
+
+# {cachelib (2), gap (3), silo} x {hybridtier} x {32GB, 128GB} x {regular, huge}
+# for gap, evaluate kronecker graph
+# assume each exp takes 1 hour
+
+if grep -q "start" "$marker_file"; then
+    #echo "=== Running hybridtier 32GB regular page" >> exp_log
+    #/bin/bash run_cachelib.sh 32 HYBRIDTIER regular
+    #/bin/bash run_gap.sh 32 HYBRIDTIER regular
+    #/bin/bash run_silo.sh 32 HYBRIDTIER regular
+
+    echo "=== Running hybridtier 32GB huge page" >> exp_log
+    /bin/bash run_cachelib.sh 32 HYBRIDTIER huge
+    /bin/bash run_gap.sh 32 HYBRIDTIER huge
+    /bin/bash run_silo.sh 32 HYBRIDTIER huge
+    echo "Benchmark hybridtier 32GB done. Rebooting in 10 seconds..." >> exp_log
+    sleep 10
+    # record completion
+    echo "exp 2" | tee $marker_file 
+    # change kernel
+    cp /etc/default/grubs_kevin/grub_hybridtier_128GB /etc/default/grub
+    update-grub2
+    echo "Rebooting." >> exp_log
+    reboot
+elif grep -q "exp 2" "$marker_file"; then
+    #echo "=== Running hybridtier 128GB regular page" >> exp_log
+    #/bin/bash run_cachelib.sh 128 HYBRIDTIER regular
+    #/bin/bash run_gap.sh 128 HYBRIDTIER regular
+    #/bin/bash run_silo.sh 128 HYBRIDTIER regular
+
+    echo "=== Running hybridtier 128GB huge page" >> exp_log
+    /bin/bash run_cachelib.sh 128 HYBRIDTIER huge
+    /bin/bash run_gap.sh 128 HYBRIDTIER huge
+    /bin/bash run_silo.sh 128 HYBRIDTIER huge
+    echo "Benchmark hybridtier 128GB done." >> exp_log
+fi
+popd
+
+exit 0
