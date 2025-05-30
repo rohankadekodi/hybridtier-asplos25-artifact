@@ -213,9 +213,9 @@ def main():
     # Iterate through sizes first
     for current_size in size_order:
         # Add a heading for the current size category
-        if output_tables: # Add separator if it's not the very first category
-            output_tables.append("---\n") # Markdown horizontal rule
-        output_tables.append(f"## {current_size.capitalize()} Tables\n")
+        #if output_tables: # Add separator if it's not the very first category
+        #    output_tables.append("---\n") # Markdown horizontal rule
+        #output_tables.append(f"## {current_size.capitalize()} Tables\n")
     
         # Filter and sort data for the current size
         # We need to iterate over workload_name, then filter by size
@@ -230,15 +230,15 @@ def main():
                 workload_list = ["cachelib-cdn", "cachelib-graph", "gapbs-bfs", "gapbs-cc", "gapbs-pr", "silo"]
                 if "cachelib" in workload_name:
                     if "throughput" in metric:
-                        output_tables.append(f"{workload_name} Throughput (Mop/s)")
+                        output_tables.append(f"{workload_name} {current_size} page - Throughput (Mop/s)")
                     if "p50" in metric:
-                        output_tables.append(f"{workload_name} P50 latency (us)")
+                        output_tables.append(f"{workload_name} {current_size} page - P50 latency (us)")
                 elif "gap" in workload_name:
-                        output_tables.append(f"{workload_name} Average runtime (s)")
+                        output_tables.append(f"{workload_name} {current_size} page - Average runtime (s)")
                 elif "silo" in workload_name:
-                        output_tables.append(f"{workload_name} Throughput (Mop/s)")
+                        output_tables.append(f"{workload_name} {current_size} page - Throughput (Mop/s)")
 
-                output_tables.append("memory config, hybridtier, memtis")
+                output_tables.append("memory config, hybridtier, memtis, hybridtier improvement")
     
                 # Get and sort memory configurations for the current workload, size, and metric
                 mem_configs_sorted = sorted(
@@ -250,7 +250,12 @@ def main():
                 for mem_config_label, systems_data in mem_configs_sorted:
                     hybridtier_val = systems_data.get('hybridtier', 'N/A')
                     memtis_val = systems_data.get('memtis', 'N/A')
-                    output_tables.append(f"{mem_config_label}, {hybridtier_val}, {memtis_val}")
+                    if "throughput" in metric:
+                        improvement = round(float(hybridtier_val)/float(memtis_val), 2)
+                    else:
+                        improvement = round(float(memtis_val)/float(hybridtier_val), 2)
+                
+                    output_tables.append(f"{mem_config_label}, {hybridtier_val}, {memtis_val}, {improvement}")
                 
                 output_tables.append("") # Add an empty line for separation between tables
     
