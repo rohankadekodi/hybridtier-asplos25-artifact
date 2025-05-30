@@ -2,10 +2,11 @@
 
 mount /dev/nvme0n1p1 /ssd1/
 
-export BIGMEMBENCH_COMMON_PATH="/ssd1/songxin8/thesis/hybridtier/hybridtier-asplos25-artifact"
+export BIGMEMBENCH_COMMON_PATH="/ssd1/asplos25_ae/hybridtier-asplos25-artifact"
+ 
+script_dir="/ssd1/asplos25_ae/hybridtier-asplos25-artifact"
+marker_file="/ssd1/asplos25_ae/hybridtier-asplos25-artifact/exp_tracker"
 
-script_dir="/ssd1/songxin8/thesis/hybridtier/hybridtier-asplos25-artifact"
-marker_file="/ssd1/songxin8/thesis/hybridtier/hybridtier-asplos25-artifact/exp_tracker"
 
 pushd $script_dir
 
