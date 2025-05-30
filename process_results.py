@@ -42,12 +42,19 @@ def get_throughput(log_path):
     with open(log_path, 'r') as f:
         for line in f:
             if "agg_throughput:" in line:
-                base_match = re.search(r'agg_throughput:\s+([0-9]+\.[0-9]+)', line)
-                exp_match = re.search(r'e\+([0-9]+)', line)
-                if base_match and exp_match:
-                    base = float(base_match.group(1))
-                    exponent = int(exp_match.group(1))
-                    return str(int(round(base * (10 ** exponent)))/1000000)
+                match = re.search(r'agg_throughput:\s+([0-9]+(?:\.[0-9]+)?(?:e[+-]?[0-9]+)?)', line, re.IGNORECASE)
+                if match:
+                    throughput = float(match.group(1))
+                    return str(round(throughput / 1000000, 6))  # return as string in millions, with rounding
+    #with open(log_path, 'r') as f:
+    #    for line in f:
+    #        if "agg_throughput:" in line:
+    #            base_match = re.search(r'agg_throughput:\s+([0-9]+\.[0-9]+)', line)
+    #            exp_match = re.search(r'e\+([0-9]+)', line)
+    #            if base_match and exp_match:
+    #                base = float(base_match.group(1))
+    #                exponent = int(exp_match.group(1))
+    #                return str(int(round(base * (10 ** exponent)))/1000000)
     return ''
 
 mem_size_map = { "32GB": "1:16", "128GB": "1:4"}

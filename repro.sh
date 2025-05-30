@@ -4,3 +4,4 @@ export BIGMEMBENCH_COMMON_PATH="/ssd1/songxin8/thesis/hybridtier/hybridtier-aspl
 
 ./repro_hybridtier.sh
 # memtis experiments will automatically be launched after hybrdtier experiments are done
+# postprocess results will run after all results are done
