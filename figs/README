@@ -1,0 +1,2 @@
+Each plot shows results for a workload with regular or huge pages.
+For throughput results, higher is better. For runtime and latency results, lower is better.
