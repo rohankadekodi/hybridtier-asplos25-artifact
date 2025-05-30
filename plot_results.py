@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import io
 
-file_path = 'result.csv'
+file_path = 'repro_results.csv'
 
 with open(file_path, 'r') as file:
     data_string = file.read()

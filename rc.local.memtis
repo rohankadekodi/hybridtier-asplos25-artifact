@@ -30,5 +30,8 @@ if grep -q "memtis_start" "$marker_file"; then
     echo "stop" | tee $marker_file 
 fi
 
+# post process results
+python process_results.py > repro_results.csv
+python plot_results.py
 
 exit 0
