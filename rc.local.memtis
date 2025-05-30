@@ -6,7 +6,6 @@ export BIGMEMBENCH_COMMON_PATH="/ssd1/songxin8/thesis/hybridtier/hybridtier-aspl
 
 script_dir="/ssd1/songxin8/thesis/hybridtier/hybridtier-asplos25-artifact/memtis"
 
-
 # {cachelib (2), gap (3), silo} x {memtis} x {32GB, 128GB} x {regular, huge}
 # for gap, evaluate kronecker graph
 # assume each exp takes 1 hour
@@ -15,9 +14,14 @@ echo "=== Running memtis experiments" >> ./exp_log
 
 pushd $script_dir
 
-/bin/bash run-cachelib.sh
-/bin/bash run-gap.sh
-/bin/bash run-silo.sh
+/bin/bash run-gap.sh &>> ./detailed_log
+echo "Done memtis gap experiments" >> ./exp_log
+/bin/bash run-cachelib.sh &>> ./detailed_log
+echo "Done memtis cachelib experiments" >> ./exp_log
+#/bin/bash run-silo.sh &>> ./detailed_log
+
+popd 
+
 echo "=== Memtis experiments done" >> ./exp_log
 
 

@@ -4,6 +4,9 @@ export BIGMEMBENCH_COMMON_PATH="/ssd1/songxin8/thesis/hybridtier/hybridtier-aspl
 
 # update boot up script
 cp ./rc.local.memtis /etc/rc.local
+echo "Updated rc.local"
+cat /etc/rc.local
+
 
 # memtis kernel
 cp /etc/default/grubs_kevin/grub_memtis /etc/default/grub

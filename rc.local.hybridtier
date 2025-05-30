@@ -12,17 +12,18 @@ pushd $script_dir
 # {cachelib (2), gap (3), silo} x {hybridtier} x {32GB, 128GB} x {regular, huge}
 # for gap, evaluate kronecker graph
 # assume each exp takes 1 hour
+touch ./exp_log
 
 if grep -q "start" "$marker_file"; then
     #echo "=== Running hybridtier 32GB regular page" >> exp_log
-    #/bin/bash run_cachelib.sh 32 HYBRIDTIER regular
-    #/bin/bash run_gap.sh 32 HYBRIDTIER regular
-    #/bin/bash run_silo.sh 32 HYBRIDTIER regular
+    #/bin/bash run_cachelib.sh 32 HYBRIDTIER regular  >> ./detailed_log
+    #/bin/bash run_gap.sh 32 HYBRIDTIER regular  >> ./detailed_log
+    #/bin/bash run_silo.sh 32 HYBRIDTIER regular >> ./detailed_log
 
     echo "=== Running hybridtier 32GB huge page" >> exp_log
-    /bin/bash run_cachelib.sh 32 HYBRIDTIER huge
-    /bin/bash run_gap.sh 32 HYBRIDTIER huge
-    /bin/bash run_silo.sh 32 HYBRIDTIER huge
+    /bin/bash run_cachelib.sh 32 HYBRIDTIER huge >> ./detailed_log
+    /bin/bash run_gap.sh 32 HYBRIDTIER huge >> ./detailed_log
+    /bin/bash run_silo.sh 32 HYBRIDTIER huge  >> ./detailed_log
     echo "Benchmark hybridtier 32GB done. Rebooting in 10 seconds..." >> exp_log
     sleep 10
     # record completion
@@ -34,15 +35,16 @@ if grep -q "start" "$marker_file"; then
     reboot
 elif grep -q "exp 2" "$marker_file"; then
     #echo "=== Running hybridtier 128GB regular page" >> exp_log
-    #/bin/bash run_cachelib.sh 128 HYBRIDTIER regular
-    #/bin/bash run_gap.sh 128 HYBRIDTIER regular
-    #/bin/bash run_silo.sh 128 HYBRIDTIER regular
+    #/bin/bash run_cachelib.sh 128 HYBRIDTIER regular >> ./detailed_log
+    #/bin/bash run_gap.sh 128 HYBRIDTIER regular >> ./detailed_log
+    #/bin/bash run_silo.sh 128 HYBRIDTIER regular >> ./detailed_log
 
     echo "=== Running hybridtier 128GB huge page" >> exp_log
-    /bin/bash run_cachelib.sh 128 HYBRIDTIER huge
-    /bin/bash run_gap.sh 128 HYBRIDTIER huge
-    /bin/bash run_silo.sh 128 HYBRIDTIER huge
+    /bin/bash run_cachelib.sh 128 HYBRIDTIER huge  >> ./detailed_log
+    /bin/bash run_gap.sh 128 HYBRIDTIER huge  >> ./detailed_log
+    /bin/bash run_silo.sh 128 HYBRIDTIER huge  >> ./detailed_log
     echo "Benchmark hybridtier 128GB done." >> exp_log
+    echo "== hybridtier experiments done." >> exp_log
 fi
 popd
 
