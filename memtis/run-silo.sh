@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NVM_RATIO="1:16 1:8 1:4"
+NVM_RATIO="1:16 1:4"
 BENCH="silo"
 
 sudo dmesg -c

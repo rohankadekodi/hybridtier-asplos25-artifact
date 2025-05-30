@@ -2,7 +2,6 @@
 
 BENCHMARKS="gapbs-cc gapbs-bfs gapbs-pr"
 NVM_RATIO="1:16 1:4"
-#BENCHMARKS="gapbs-cc-urand gapbs-bfs-urand gapbs-pr-urand"
 
 NUM_THREADS=16
 export OMP_NUM_THREADS=${NUM_THREADS}

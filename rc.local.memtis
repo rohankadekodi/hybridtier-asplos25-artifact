@@ -5,6 +5,7 @@ mount /dev/nvme0n1p1 /ssd1/
 export BIGMEMBENCH_COMMON_PATH="/ssd1/songxin8/thesis/hybridtier/hybridtier-asplos25-artifact"
 
 script_dir="/ssd1/songxin8/thesis/hybridtier/hybridtier-asplos25-artifact/memtis"
+marker_file="/ssd1/songxin8/thesis/hybridtier/hybridtier-asplos25-artifact/exp_tracker"
 
 # {cachelib (2), gap (3), silo} x {memtis} x {32GB, 128GB} x {regular, huge}
 # for gap, evaluate kronecker graph
@@ -14,15 +15,20 @@ echo "=== Running memtis experiments" >> ./exp_log
 
 pushd $script_dir
 
-/bin/bash run-gap.sh &>> ./detailed_log
-echo "Done memtis gap experiments" >> ./exp_log
-/bin/bash run-cachelib.sh &>> ./detailed_log
-echo "Done memtis cachelib experiments" >> ./exp_log
-#/bin/bash run-silo.sh &>> ./detailed_log
+if grep -q "memtis_start" "$marker_file"; then
 
-popd 
-
-echo "=== Memtis experiments done" >> ./exp_log
+    /bin/bash run-gap.sh &>> ./detailed_log
+    echo "Done memtis gap experiments" >> ./exp_log
+    /bin/bash run-cachelib.sh &>> ./detailed_log
+    echo "Done memtis cachelib experiments" >> ./exp_log
+    /bin/bash run-silo.sh &>> ./detailed_log
+    echo "Done memtis silo experiments" >> ./exp_log
+    
+    popd 
+    
+    echo "=== Memtis experiments done" >> ./exp_log
+    echo "stop" | tee $marker_file 
+fi
 
 
 exit 0
