@@ -18,21 +18,17 @@ pushd $script_dir
 
 if grep -q "memtis_start" "$marker_file"; then
 
-    /bin/bash run-gap.sh &>> ./detailed_log
-    echo "Done memtis gap experiments" >> ./exp_log
-    /bin/bash run-cachelib.sh &>> ./detailed_log
-    echo "Done memtis cachelib experiments" >> ./exp_log
-    /bin/bash run-silo.sh &>> ./detailed_log
-    echo "Done memtis silo experiments" >> ./exp_log
+    /bin/bash run-gap.sh &>> ../detailed_log
+    echo "Done memtis gap experiments" >> ../exp_log
+    /bin/bash run-cachelib.sh &>> ../detailed_log
+    echo "Done memtis cachelib experiments" >> ../exp_log
+    /bin/bash run-silo.sh &>> ../detailed_log
+    echo "Done memtis silo experiments" >> ../exp_log
     
     popd 
     
     echo "=== Memtis experiments done" >> ./exp_log
     echo "stop" | tee $marker_file 
 fi
-
-# post process results
-python3 process_results.py > repro_results.csv
-python3 plot_results.py
 
 exit 0
