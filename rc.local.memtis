@@ -32,7 +32,7 @@ if grep -q "memtis_start" "$marker_file"; then
 fi
 
 # post process results
-python process_results.py > repro_results.csv
-python plot_results.py
+python3 process_results.py > repro_results.csv
+python3 plot_results.py
 
 exit 0
