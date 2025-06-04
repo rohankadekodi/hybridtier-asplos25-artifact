@@ -7,7 +7,7 @@ HybridTier: An Adaptive and Lightweight CXL-Memory Tiering System
 
 
 ## Kernel setup
-This section assumes you have a two NUMA node system to emulate fast-tier and slow-tier CXL memory. 
+_This section assumes you have a two NUMA node system to emulate fast-tier and slow-tier CXL memory._
 If you have a different hardware platform, e.g. one with real CXL memory or persistent memory, please see [this section](#porting-hybridtier-to-other-hardware-platforms). 
 
 While the HybridTier runtime does not require a specific kernel, emulating CXL memory using remote NUMA node requires a few minor modifications to the Linux kernel.
@@ -59,7 +59,33 @@ sudo update-grub2
 sudo reboot
 ```
 
+After boot, you can confirm how much memory is available on each node:
+```bash
+numactl -H
+available: 2 nodes (0-1)
+node 0 cpus: ...
+node 0 size: 515677 MB
+node 0 free: 64450 MB # this should be ~64GB
+node 1 cpus: ...
+node 1 size: 516053 MB
+node 1 free: 511754 MB
+```
+
 ### Approach 2
+To modify your own kernel, apply the following changes:
+- https://github.com/kevins981/linux/commit/b67c20ae0d5f5679bfda75140315ca74b084ea51
+- https://github.com/kevins981/linux/commit/ce0241fa9faa3df745830e00f4afc6dedc81cb09
+- https://github.com/kevins981/linux/commit/26cf3cdb4019f495f354a53090db03aa6549b291
+- https://github.com/kevins981/linux/commit/81ca81500680260c88827f0b8548ea4dcd42ee97
+
+These changes are needed to emulate CXL memory on a two NUMA node system. It also disables existing kernel tiering to avoid interfering with HybridTier. 
+
+Note that these changes are made based on the v6.2 mainline kernel. For other kernel versions, the location of changes may be different.
 
 ## Porting HybridTier to other hardware platforms
-The provided source code is implemented for two NUMA node system to emulate fast-tier and slow-tier CXL memory. It will not work out of the box on a system with e.g. real CXL memory or persistent memory
+The provided source code is implemented for Intel two NUMA node system to emulate fast-tier and slow-tier CXL memory. It will not work out of the box on a system with e.g. real CXL memory or persistent memory
+
+Here, we provide some pointer on what one should consider when porting HybridTier to other hardware platforms. 
+- HybridTier uses perf events to capture accesses to fast-tier and slow-tier memory. Fast-tier memory is emulated by NUMA node 0, and CXL memory by NUMA node 1. Thus, we use the `MEM_LOAD_L3_MISS_RETIRED.LOCAL_DRAM` event to capture fast-tier accesses and `MEM_LOAD_L3_MISS_RETIRED.REMOTE_DRAM` for slow-tier accesses. To port HybridTier to other hw systems, these two events need to be modified to reflect the hardware. For example, on a system with real CXL memory, `MEM_LOAD_L3_MISS_RETIRED.LOCAL_DRAM` should be replaced by the event representing accesses to local memory, while `MEM_LOAD_L3_MISS_RETIRED.REMOTE_DRAM` should be replaced by CXL memory access event.  
+- HybridTier uses Process Event Based Sampling (PEBS), available on Intel processors. To use HybridTier on other processor systems, one would need to find the equivalent performance counter interface to replace PEBS. For example, one can consider using Instruction Based Sampling (IBS) for ADM processor systems.
+
