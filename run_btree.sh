@@ -21,6 +21,9 @@ NUM_THREADS=16
 export OMP_NUM_THREADS=${NUM_THREADS}
 
 #WORKLOAD_DIR="/ssd1/songxin8/thesis/hybridtier/workloads/gapbs"
+WORKLOAD_DIR="/home/rohan/memtis/memtis-userspace/bench_dir/gapbs"
+DURATION=3600
+NUM_ITERS=1
 
 #TODO: this should be moved to run exp common
 # set page type
@@ -33,5 +36,5 @@ else
 fi
 
 #COMMAND_STRING="/mnt/storage/rohan/tieredmemory/memtis/memtis-userspace/bench_dir/flexkvs/kvsbench -t 8 -T 110 -w 10 -h 0.20 -D 60 -H 0.20 127.0.0.1:11211 -S $((20*1024*1024*1024))"
-COMMAND_STRING="/homes/rohank2/maphea_share/benchmark/silo-malloc/out-perf.masstree/benchmarks/dbtest --verbose --bench ycsb --num-threads 20 --scale-factor 68840 --ops-per-worker=125000000 --slow-exit"
-run_bench "silo" "$COMMAND_STRING" "dbtest" "$TIERING_SYSTEM" "$FAST_TIER_SIZE_GB" "$PAGE_TYPE"
+COMMAND_STRING="/home/inteluser/rohan/maphea_share/benchmark/vmitosis-workloads/bin/bench_btree_mt"
+run_bench "btree_mt" "$COMMAND_STRING" "bench_btree_mt" "$TIERING_SYSTEM" "$FAST_TIER_SIZE_GB" "$PAGE_TYPE"

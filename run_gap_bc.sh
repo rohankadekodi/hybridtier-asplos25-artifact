@@ -26,9 +26,9 @@ DURATION=3600
 NUM_ITERS=1
 
 #declare -a GRAPH_LIST=("g31k4" "u31k4")
-declare -a GRAPH_LIST=("u30k2")
+declare -a GRAPH_LIST=("g29k6")
 #declare -a EXE_LIST=("bfs" "cc" "pr")
-declare -a EXE_LIST=("pr")
+declare -a EXE_LIST=("bc")
 
 #TODO: this should be moved to run exp common
 # set page type
@@ -44,13 +44,13 @@ for graph in "${GRAPH_LIST[@]}"
 do
   for exe in "${EXE_LIST[@]}"
   do
-    if [[ "$graph" == "g30k4" ]]; then
+    if [[ "$graph" == "g29k6" ]]; then
       case $exe in
         "bfs")
           COMMAND_STRING="${WORKLOAD_DIR}/${exe} -g 30 -k 4 -n256"
           ;;
-        "pr")
-          COMMAND_STRING="${WORKLOAD_DIR}/${exe} -g 30 -k 4 -i1000 -t1e-4 -n16"
+        "bc")
+          COMMAND_STRING="${WORKLOAD_DIR}/${exe} -f /home/rohan/kronecker_graph_29_6.sg"
           ;;
         "cc")
           COMMAND_STRING="${WORKLOAD_DIR}/${exe} -g 30 -k 4 -n256"

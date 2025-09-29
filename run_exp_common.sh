@@ -1,13 +1,14 @@
 #!/bin/bash
 
-HYBRIDTIER_KERNEL_VER="6.2.0-hybridtier+"
+HYBRIDTIER_KERNEL_VER="6.2.0-hybridtier-hybridtier+"
 AUTONUMA_KERNEL_VER="6.2.0-autonuma+"
 TPP_KERNEL_VER="6.0.0+"
 MULTICLOCK_KERNEL_VER="5.3.1-multiclock"
-NO_NUMA_KERNEL_VER="6.2.0-hybridtier+"
+NO_NUMA_KERNEL_VER="6.2.0-hybridtier-hybridtier+"
 DAMO_KERNEL_VER="5.19.17" 
 
-PERF_EXE="/ssd1/songxin8/thesis/autonuma/linux-v6.2-autonuma/tools/perf/perf"
+#PERF_EXE="/ssd1/songxin8/thesis/autonuma/linux-v6.2-autonuma/tools/perf/perf"
+PERF_EXE="/usr/bin/perf"
 PERF_STAT_PID=
 
 config_tiering_system() {

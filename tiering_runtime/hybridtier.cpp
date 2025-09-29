@@ -51,7 +51,7 @@
 // Perf related 
 //#define PERF_PAGES	(1 + (1 << 7))	// Has to be == 1+2^n, 
 #define PERF_PAGES	(1 + (1 << 5))	// Has to be == 1+2^n, 
-#define NPROC 16
+#define NPROC 20
 #define NPBUFTYPES 2
 #define LOCAL_DRAM_LOAD 0
 #define REMOTE_DRAM_LOAD 1
@@ -285,8 +285,10 @@ struct perf_event_mmap_page* perf_setup_one_event(__u64 config, __u64 cpu, __u64
     //pe.disabled = 0;
     pe.disabled = 1;
     //pe.freq = 0;
-    pe.freq = 1;
     pe.sample_freq = perf_sample_freq;
+    /*
+    pe.freq = 1;
+    */
     pe.exclude_kernel = 1;
     pe.exclude_hv = 0;
     pe.exclude_callchain_kernel = 1;
@@ -304,7 +306,7 @@ struct perf_event_mmap_page* perf_setup_one_event(__u64 config, __u64 cpu, __u64
     fd[cpu][type] = perf_event_open(&pe, -1, cpu, -1, 0);
     if (fd[cpu][type] == -1) {
        std::perror("failed");
-       fprintf(stderr, "Error opening leader %llx\n", pe.config);
+       fprintf(stderr, "Error opening leader %llx for cpu %lu. Error code %s\n", pe.config, cpu, strerror(errno));
        exit(EXIT_FAILURE);
     }
 
@@ -335,7 +337,7 @@ struct perf_event_mmap_page* perf_setup_one_event(__u64 config, __u64 cpu, __u64
 void perf_setup(__u64 perf_sample_freq) {
   for (int i = 0; i < NPROC; i++) {
     perf_page[i][LOCAL_DRAM_LOAD]  = perf_setup_one_event(0x1d3, i, LOCAL_DRAM_LOAD, perf_sample_freq); // MEM_LOAD_L3_MISS_RETIRED.LOCAL_DRAM
-    perf_page[i][REMOTE_DRAM_LOAD] = perf_setup_one_event(0x2d3, i, REMOTE_DRAM_LOAD, perf_sample_freq); // MEM_LOAD_L3_MISS_RETIRED.REMOTE_DRAM
+    perf_page[i][REMOTE_DRAM_LOAD] = perf_setup_one_event(0x80d1, i, REMOTE_DRAM_LOAD, perf_sample_freq); // MEM_LOAD_L3_MISS_RETIRED.REMOTE_DRAM
   }
 }
 
@@ -358,7 +360,7 @@ void change_perf_freq(int i, int j, __u64 new_sample_freq) {
   if (j == LOCAL_DRAM_LOAD) {
     perf_page[i][j] = perf_setup_one_event(0x1d3, i, LOCAL_DRAM_LOAD, new_sample_freq);
   } else if (j == REMOTE_DRAM_LOAD) {
-    perf_page[i][j] = perf_setup_one_event(0x2d3, i, REMOTE_DRAM_LOAD, new_sample_freq); // MEM_LOAD_L3_MISS_RETIRED.LOCAL_DRAM
+    perf_page[i][j] = perf_setup_one_event(0x80d1, i, REMOTE_DRAM_LOAD, new_sample_freq); // MEM_LOAD_L3_MISS_RETIRED.LOCAL_DRAM
   }
 }
 
@@ -367,8 +369,8 @@ void start_perf_stat() {
   // I am using the perf executable instead of perf_event_open to monitor hardware counters
   // because there is no need to use perf_event_open, since the performance overhead of using the perf executable 
   // is negligible. 
-  const char* perf_stat_cmd = "/ssd1/songxin8/thesis/autonuma/linux-6.1-rc6/tools/perf/perf stat -I 60000 -e mem_load_l3_miss_retired.local_dram -e mem_load_l3_miss_retired.remote_dram -x , --output perf_stat_file &";
-  std::cout << "/ssd1/songxin8/thesis/autonuma/linux-6.1-rc6/tools/perf/perf stat -I 60000 -e mem_load_l3_miss_retired.local_dram -e mem_load_l3_miss_retired.remote_dram -x , --output perf_stat_file &" << std::endl;
+  const char* perf_stat_cmd = "/usr/bin/perf stat -I 60000 -e mem_load_l3_miss_retired.local_dram -e mem_load_retired.local_pmm -x , --output perf_stat_file &";
+  std::cout << "/usr/bin/perf stat -I 60000 -e mem_load_l3_miss_retired.local_dram -e mem_load_retired.local_pmm -x , --output perf_stat_file &" << std::endl;
   // Launch perf stat in the command line. 
   int ret_code = system(perf_stat_cmd);
   std::cout << "[INFO] perf stat command return code: " << ret_code << std::endl;
@@ -673,7 +675,7 @@ uint64_t scan_for_cold_pages(int pid, int hot_thresh,
 
   for (uint64_t i = 0; i < num_pages_to_demote_actual; i++) {
     demote_pages[i] = (int*)(cold_page_list[i]);
-    demote_nodes[i] = 1; // Demote to node 1
+    demote_nodes[i] = 2; // Demote to node 2
     demote_status[i] = 99;
   }
 
@@ -928,7 +930,7 @@ perf_sampling_start:
                       for (uint64_t ll = 0; ll < num_pages_to_migrate; ll++) {
                         if (dbg_status[ll] == 0) {
                           num_pages_in_fast++;
-                        } else if (dbg_status[ll] == 1) {
+                        } else if (dbg_status[ll] == 2) {
                           num_pages_in_slow++;
                           //printf("promoting slow tier page %lx\n", (uint64_t)(migrate_pages[ll]));
                         } else {
@@ -1021,7 +1023,7 @@ perf_sampling_start:
 
                           for (uint64_t kk = 0; kk < demote_page_list.size(); kk++) {
                             demote_pages[kk] = (int*)(demote_page_list[kk]);
-                            demote_nodes[kk] = 1; // Demote to node 1
+                            demote_nodes[kk] = 2; // Demote to node 2
                             demote_status[kk] = 99;
                           }
 

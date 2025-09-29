@@ -18,14 +18,15 @@ FAST_TIER_SIZE_GB=$1
 TIERING_SYSTEM=$2
 PAGE_TYPE=$3
 
-WORKLOAD_DIR="/ssd1/songxin8/spec_cpu_2017/benchspec/CPU/654.roms_s/run/run_base_refspeed_mytest-m64.0001"
+#WORKLOAD_DIR="/ssd1/songxin8/spec_cpu_2017/benchspec/CPU/654.roms_s/run/run_base_refspeed_mytest-m64.0001"
+WORKLOAD_DIR="/mnt/storage/rohan/tieredmemory/spec-installation/benchspec/CPU/654.roms_s/build/build_base_tiered-mem-m64.0002"
 
 NUM_THREADS=16
 export OMP_NUM_THREADS=${NUM_THREADS}
 
-EXE="$WORKLOAD_DIR/sroms_base.mytest-m64"
-EXE_NAME="sroms_base.mytest-m64"
-ARGS="< $WORKLOAD_DIR/ocean_benchmark3.in"
+EXE="$WORKLOAD_DIR/sroms"
+EXE_NAME="sroms"
+#ARGS="< $WORKLOAD_DIR/ocean_benchmark3.in"
 
 echo "Fast tier size is $FAST_TIER_SIZE_GB GB"
 echo "Runnign tiering system $TIERING_SYSTEM"

@@ -33,5 +33,5 @@ else
 fi
 
 #COMMAND_STRING="/mnt/storage/rohan/tieredmemory/memtis/memtis-userspace/bench_dir/flexkvs/kvsbench -t 8 -T 110 -w 10 -h 0.20 -D 60 -H 0.20 127.0.0.1:11211 -S $((20*1024*1024*1024))"
-COMMAND_STRING="/homes/rohank2/maphea_share/benchmark/silo-malloc/out-perf.masstree/benchmarks/dbtest --verbose --bench ycsb --num-threads 20 --scale-factor 68840 --ops-per-worker=125000000 --slow-exit"
-run_bench "silo" "$COMMAND_STRING" "dbtest" "$TIERING_SYSTEM" "$FAST_TIER_SIZE_GB" "$PAGE_TYPE"
+COMMAND_STRING="/mnt/storage/rohan/tieredmemory/memtis/memtis-userspace/bench_dir/XSBench/openmp-threading/XSBench_dbg -t 20 -g 300000 -p 1000000 -G nuclide"
+run_bench "xsbench" "$COMMAND_STRING" "XSBench_dbg" "$TIERING_SYSTEM" "$FAST_TIER_SIZE_GB" "$PAGE_TYPE"
